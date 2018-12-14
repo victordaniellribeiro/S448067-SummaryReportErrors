@@ -1,0 +1,44 @@
+.grid-header-project .x-box-inner {
+    width: 140px;
+    height: 145px !important;
+}
+
+.grid-header-project .x-box-target {
+    height: 145px !important;
+}
+
+.grid-header-project .x-column-header {
+    height: 145px !important;
+}
+
+.grid-header-project .x-column-header-inner {
+    height: 145px !important;
+}
+
+.grid-header-project .x-column-header-text {
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+    
+    /* transform doesn't work on inline elements */
+    display: inline-flex;
+    
+    
+    text-align: left;
+    font-weight: bold;
+    border-left-color: #fff;
+    width: 40px !important;
+    height: 25px !important;
+    position: relative;
+    margin-top: 100px;
+}
+
+.x-ie8 .grid-header-project .x-column-header-text {
+    /* IE8 doesn't have css transform */
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1);
+    position: absolute;
+    left: 25px;
+    bottom: 20px;
+}
