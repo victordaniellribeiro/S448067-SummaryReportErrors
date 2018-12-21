@@ -177,7 +177,7 @@ Ext.define('CustomApp', {
 			            var value = newValue.parameter;
 			            this._searchParameter = value;
 
-			            console.log('value radio:', value);
+			            // console.log('value radio:', value);
 
 			            if (value == 'r') {
 			            	releaseComboBox.show();
@@ -219,7 +219,7 @@ Ext.define('CustomApp', {
 
     	Deft.Promise.all(artifactsPromise).then({
     		success: function(artifacts) {
-    			console.log('artifacts loaded:', artifacts);
+    			// console.log('artifacts loaded:', artifacts);
 
     			var dataMap = this._loadData(artifacts);
 
@@ -336,7 +336,6 @@ Ext.define('CustomApp', {
 				featurepercentAndStateMismatch: project.featureStatistics.percentAndStateMismatch,
 				featureoldReleaseNotDone: project.featureStatistics.oldReleaseNotDone,
 				featurestateDoneButNoRelease: project.featureStatistics.stateDoneButNoRelease,
-				featureagingReport: project.featureStatistics.agingReport,
  
 				storynotSizedCorrectly: project.storyStatistics.notSizedCorrectly,
 				storynoParent: project.storyStatistics.noParent,
@@ -368,7 +367,6 @@ Ext.define('CustomApp', {
 				percentAndStateMismatch: project.featureStatistics.percentAndStateMismatch,
 				oldReleaseNotDone: project.featureStatistics.oldReleaseNotDone,
 				stateDoneButNoRelease: project.featureStatistics.stateDoneButNoRelease,
-				agingReport: project.featureStatistics.agingReport
 			});
 
 			dataStories.push({
@@ -398,7 +396,7 @@ Ext.define('CustomApp', {
 
 
 		var featureStore = Ext.create('Ext.data.JsonStore', {
-			fields:['projectName', 'missingStrategy', 'notSizedCorrectly', 'noParent', 'missingPlannedEndDate', 'missingActualEndDate', 'percentAndStateMismatch', 'oldReleaseNotDone', 'stateDoneButNoRelease', 'agingReport'],
+			fields:['projectName', 'missingStrategy', 'notSizedCorrectly', 'noParent', 'missingPlannedEndDate', 'missingActualEndDate', 'percentAndStateMismatch', 'oldReleaseNotDone', 'stateDoneButNoRelease'],
             data: dataFeatures
         });
 
@@ -440,10 +438,10 @@ Ext.define('CustomApp', {
 			        		var type = cls.split(/[-]/)[1];
 			        		var errorType = cls.split(/[-]/)[2];
 
-			        		console.log(type, errorType);
-			        		console.log(this._mapErrors[projectName]);
-			        		console.log(this._mapErrors[projectName][type]);
-			        		console.log(this._mapErrors[projectName][type][errorType]);
+			        		// console.log(type, errorType);
+			        		// console.log(this._mapErrors[projectName]);
+			        		// console.log(this._mapErrors[projectName][type]);
+			        		// console.log(this._mapErrors[projectName][type][errorType]);
 
 			        		this._showDetailsGrid(this._mapErrors[projectName][type][errorType]);
 			        	}
@@ -511,12 +509,6 @@ Ext.define('CustomApp', {
                     dataIndex: 'stateDoneButNoRelease',
                     flex: 2,
                     tdCls: 'custom-features-stateDoneButNoRelease'
-                },
-                {
-                    text: 'Aging Report',
-                    dataIndex: 'agingReport',
-                    flex: 2,
-                    tdCls: 'custom-features-agingReport'
                 }
             ]
         });
@@ -540,10 +532,10 @@ Ext.define('CustomApp', {
 			        		var type = cls.split(/[-]/)[1];
 			        		var errorType = cls.split(/[-]/)[2];
 
-			        		console.log(type, errorType);
-			        		console.log(this._mapErrors[projectName]);
-			        		console.log(this._mapErrors[projectName][type]);
-			        		console.log(this._mapErrors[projectName][type][errorType]);
+			        		// console.log(type, errorType);
+			        		// console.log(this._mapErrors[projectName]);
+			        		// console.log(this._mapErrors[projectName][type]);
+			        		// console.log(this._mapErrors[projectName][type][errorType]);
 
 			        		this._showDetailsGrid(this._mapErrors[projectName][type][errorType]);
 			        	}
@@ -615,10 +607,10 @@ Ext.define('CustomApp', {
 			        		var type = cls.split(/[-]/)[1];
 			        		var errorType = cls.split(/[-]/)[2];
 
-			        		console.log(type, errorType);
-			        		console.log(this._mapErrors[projectName]);
-			        		console.log(this._mapErrors[projectName][type]);
-			        		console.log(this._mapErrors[projectName][type][errorType]);
+			        		// console.log(type, errorType);
+			        		// console.log(this._mapErrors[projectName]);
+			        		// console.log(this._mapErrors[projectName][type]);
+			        		// console.log(this._mapErrors[projectName][type][errorType]);
 
 			        		this._showDetailsGrid(this._mapErrors[projectName][type][errorType]);
 			        	}
@@ -687,7 +679,7 @@ Ext.define('CustomApp', {
                     flex: 2
                 },
                 {
-                    text: 'iterationButNoRelease',
+                    text: 'Iteration But No Release',
                     dataIndex: 'iterationButNoRelease',
                     tdCls: 'custom-defects-iterationButNoRelease',
                     flex: 2
@@ -764,7 +756,7 @@ Ext.define('CustomApp', {
 
     	if (artifacts && artifacts.length > 0) {
 
-    		console.log('totalArtifacts to show:', artifacts);
+    		// console.log('totalArtifacts to show:', artifacts);
 	    	var localArtifacts = [];
 
 	    	_.each(artifacts, function(record) {
@@ -917,8 +909,7 @@ Ext.define('CustomApp', {
 		    		missingActualEndDate: [],
 		    		percentAndStateMismatch: [],
 		    		oldReleaseNotDone: [],
-		    		stateDoneButNoRelease: [],
-		    		agingReport: []
+		    		stateDoneButNoRelease: []
             	}, 
             	stories : {
             		noParent: [],
@@ -957,8 +948,8 @@ Ext.define('CustomApp', {
 
     	//each iteration/release have errors
 
-    	console.log('projects with statistics:', projects);
-    	console.log('project error map:', this._mapErrors);
+    	// console.log('projects with statistics:', projects);
+    	// console.log('project error map:', this._mapErrors);
 
     	return projects;
     },
@@ -977,7 +968,6 @@ Ext.define('CustomApp', {
     		percentAndStateMismatch: 0,
     		oldReleaseNotDone: 0,
     		stateDoneButNoRelease: 0,
-    		agingReport: 0
     	};
 
 
@@ -995,15 +985,21 @@ Ext.define('CustomApp', {
 
             	var releaseDate = null;
             	if (artifact.get('Release')) {
-            		releaseDate = artifact.get('Release').ReleaseDate;
+            		releaseDate = new Date(artifact.get('Release').ReleaseDate);
             	}
+
+                var preliValues = ['XS', 'S', 'M', 'L', 'XL'];
+                var preliminaryEstimate = null;
+                if (artifact.get('PreliminaryEstimate')) {
+                    preliminaryEstimate = artifact.get('PreliminaryEstimate').Name;
+                }
 
             	if (!artifact.get('c_StrategyCategory')) {
             		statistics.missingStrategy += 1;
             		this._mapErrors[projectName].features.missingStrategy.push(artifact);
             	}
 
-            	if (!artifact.get('PreliminaryEstimate')) {
+            	if (!preliminaryEstimate || (preliValues.indexOf(preliminaryEstimate) === -1)) {
             		statistics.notSizedCorrectly += 1;
             		this._mapErrors[projectName].features.notSizedCorrectly.push(artifact);
             	}
@@ -1018,14 +1014,15 @@ Ext.define('CustomApp', {
             		this._mapErrors[projectName].features.missingPlannedEndDate.push(artifact);
             	}
 
-            	if (!artifact.get('ActualEndDate')) {
+            	if (!artifact.get('ActualEndDate') && ((state == 'Staging') || (state == 'Done'))) {
+                    console.log(artifact, artifact.get('ActualEndDate'));
             		statistics.missingActualEndDate +=1;
             		this._mapErrors[projectName].features.missingActualEndDate.push(artifact);
             	}
 
-            	if ( ((percentDoneByStoryCount > 0) && (percentDoneByStoryCount < 1) && (state !== "In-Progress")) ||
-            			( (percentDoneByStoryCount = 1) && (state !== "Done") && (state !== "Staging") ) ||
-            			( (state !== "Elaborating") && (state !== "Exploring") && (state !== null) && (percentDoneByStoryCount = 0) )
+            	if (    ( ((percentDoneByStoryCount > 0) && (percentDoneByStoryCount < 1)) && (state !== "In-Progress") ) ||
+            			( (percentDoneByStoryCount == 1) && ((state !== "Done") && (state !== "Staging")) ) ||
+            			( (percentDoneByStoryCount == 0) && ((state !== "Elaborating") && (state !== "Exploring") && (state !== null)) )
             		) {
             		statistics.percentAndStateMismatch += 1;
             		this._mapErrors[projectName].features.percentAndStateMismatch.push(artifact);
@@ -1034,7 +1031,7 @@ Ext.define('CustomApp', {
 
 				//oldReleaseNotDone
 				var today = new Date();
-            	if ( (releaseDate < today) && (state !== "Done") && (state !== "Staging") ) {
+            	if (releaseDate && (releaseDate < today) && ((state !== "Done") && (state !== "Staging")) ) {
 					statistics.oldReleaseNotDone += 1;
 					this._mapErrors[projectName].features.oldReleaseNotDone.push(artifact);
             	}
@@ -1045,10 +1042,10 @@ Ext.define('CustomApp', {
             	}
 
 
-            	if ((artifact.creationDate < "2018-01-01T00:00:00.000Z") && (state != "Done")) {
-            		statistics.agingReport +=1;
-            		this._mapErrors[projectName].features.agingReport.push(artifact);
-            	}
+            	// if ((artifact.creationDate < "2018-01-01T00:00:00.000Z") && (state != "Done")) {
+            	// 	statistics.agingReport +=1;
+            	// 	this._mapErrors[projectName].features.agingReport.push(artifact);
+            	// }
             }            
         }, this);
 
@@ -1082,7 +1079,7 @@ Ext.define('CustomApp', {
 
             	var iterationEndDate = null;
             	if (artifact.get('Iteration')) {
-            		iterationEndDate = artifact.get('Iteration').EndDate;
+            		iterationEndDate = new Date(artifact.get('Iteration').EndDate);
             	}
 
             	if (!parent && creationDate > new Date('2017-08-13T00:00:00.000Z')) {
@@ -1153,14 +1150,16 @@ Ext.define('CustomApp', {
             	var iteration = artifact.get('Iteration');
             	var release = artifact.get('Release');
             	var state = artifact.get('State');
+                var environment = artifact.get('Environment');
 
             	var planValues = [0, 1, 2, 3, 5, 8];
             	var today = new Date();
 
             	if (iteration) {
-	            	if ((scheduleState !== 'Accepted') && (iteration.EndDate < today) && (creationDate > new Date('2017-08-13T00:00:00.000Z'))) {
-	            		statistics.oldIterationNotAccepted += 1;
-	            		this._mapErrors[projectName].defects.oldIterationNotAccepted.push(artifact);
+                    var iterationEndDate = new Date(iteration.EndDate);
+                    if ((scheduleState !== 'Accepted' && scheduleState !== "Ready to Ship") && (iterationEndDate < today) && (creationDate > new Date('2017-08-13T00:00:00.000Z'))) {
+                        statistics.oldIterationNotAccepted += 1;
+                        this._mapErrors[projectName].defects.oldIterationNotAccepted.push(artifact);
 	            	}
 	            }
 
@@ -1174,32 +1173,32 @@ Ext.define('CustomApp', {
             		this._mapErrors[projectName].defects.notSizedCorrectly.push(artifact);
             	}
 
-            	if ( !artifact.get('Environment') && creationDate > new Date("2017-08-13T00:00:00.000Z") ) {
+            	if ((!environment || environment == 'None') && creationDate > new Date("2017-08-13T00:00:00.000Z") ) {
             		statistics.noEnvironment += 1;
             		this._mapErrors[projectName].defects.noEnvironment.push(artifact);
-            		console.log("Environment", artifact);
+            		// console.log("Environment", artifact);
             	}
 
-            	if ( (scheduleState === "Accepted" || scheduleState === "Ready to Ship") && !artifact.get('Resolution') && (creationDate > new Date("2017-08-13T00:00:00.000Z")) ) {
+            	if ( (scheduleState === "Accepted" || scheduleState === "Ready to Ship") && (!resolution || resolution == 'None') && (creationDate > new Date("2017-08-13T00:00:00.000Z")) ) {
             		statistics.noResolution += 1;
             		this._mapErrors[projectName].defects.noResolution.push(artifact);
-            		console.log("Resolution", artifact);
+            		// console.log("Resolution", artifact);
             	}
 
-            	if ( (scheduleState === "Accepted" || scheduleState === "Ready to Ship") && !artifact.get('c_RootCause') && (creationDate > new Date("2017-08-13T00:00:00.000Z")) ) {
+            	if ( (scheduleState === "Accepted" || scheduleState === "Ready to Ship") && artifact.get('c_RootCause').Count == 0 && (creationDate > new Date("2017-08-13T00:00:00.000Z")) ) {
             		statistics.rootCause += 1;
             		this._mapErrors[projectName].defects.rootCause.push(artifact);
-            		console.log("rootCause", artifact);
+            		// console.log("rootCause", artifact);
             	}
 
-            	if ( !artifact.get('Milestones') &&
+            	if ( artifact.get('Milestones').Count == 0 &&
             			(scheduleState === "Accepted" || scheduleState === "Ready to Ship") &&
             			(state == "Closed") &&
             			(resolution == "Code Change" || resolution == "Configuration Change" || resolution == "Database Change" || resolution == "Deployment Issue") &&
             			(creationDate > new Date("2017-08-13T00:00:00.000Z") )
 
             		) {
-            		console.log('Milestones', artifact);
+            		// console.log('Milestones', artifact);
             		this._mapErrors[projectName].defects.noMilestone.push(artifact);
             		statistics.noMilestone += 1;
             	}
@@ -1208,7 +1207,7 @@ Ext.define('CustomApp', {
             			|| ((scheduleState != "Accepted" && scheduleState != 'Ready to Ship') && state == "Closed") 
             			&& (creationDate > new Date("2017-08-13T00:00:00.000Z"))
             		) {
-            		console.log('state mismatched', artifact);
+            		// console.log('state mismatched', artifact);
             		this._mapErrors[projectName].defects.mismatchStateAndSchedule.push(artifact);
             		statistics.mismatchStateAndSchedule += 1;
             	}
