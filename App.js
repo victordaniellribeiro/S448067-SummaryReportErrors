@@ -420,36 +420,78 @@ Ext.define('CustomApp', {
 
     	dataMap.eachKey(function(projectName, project) {
     		//exportData
-    		this._exportData.push({
-    			projectName: projectName, 
-				featuremissingStrategy: project.featureStatistics.missingStrategy,
-				featurenotSizedCorrectly: project.featureStatistics.notSizedCorrectly,
-				featurenoParent: project.featureStatistics.noParent,
-				featuremissingPlannedEndDate: project.featureStatistics.missingPlannedEndDate,
-				featuremissingActualEndDate: project.featureStatistics.missingActualEndDate,
-				featurepercentAndStateMismatch: project.featureStatistics.percentAndStateMismatch,
-				featureoldReleaseNotDone: project.featureStatistics.oldReleaseNotDone,
-				featurestateDoneButNoRelease: project.featureStatistics.stateDoneButNoRelease,
-                featuremissingLevelIdentifier: project.featureStatistics.missingLevelIdentifier,
- 
-				storynotSizedCorrectly: project.storyStatistics.notSizedCorrectly,
-				storynoParent: project.storyStatistics.noParent,
-				storynoTestCases: project.storyStatistics.noTestCases,
-				storyiterationButNoRelease: project.storyStatistics.iterationButNoRelease,
-				storyreleaseButNoIteration: project.storyStatistics.releaseButNoIteration,
-				storyoldIterationNotAccepted: project.storyStatistics.oldIterationNotAccepted,
 
-				defectnoParent: project.defectStatistics.noParent,
-				defectnotSizedCorrectly: project.defectStatistics.notSizedCorrectly,
-				defectnoEnvironment: project.defectStatistics.noEnvironment,
-				defectnoResolution: project.defectStatistics.noResolution,
-				defectrootCause: project.defectStatistics.rootCause,
-				defectnoMilestone: project.defectStatistics.noMilestone,
-				defectoldIterationNotAccepted: project.defectStatistics.oldIterationNotAccepted,
-				defectmismatchStateAndSchedule: project.defectStatistics.mismatchStateAndSchedule,
-				defectmissingIteration: project.defectStatistics.missingIteration,
-				defectiterationButNoRelease: project.defectStatistics.iterationButNoRelease
-    		});
+            if (this._includeInitiative) {
+        		this._exportData.push({
+        			projectName: projectName,
+
+                    initiativemissingStrategy: project.initiativeStatistics.missingStrategy,
+                    initiativenotSizedCorrectly: project.initiativeStatistics.notSizedCorrectly,
+                    initiativemissingPlannedEndDate: project.initiativeStatistics.missingPlannedEndDate,
+                    initiativemissingActualEndDate: project.initiativeStatistics.missingActualEndDate,
+                    initiativepercentAndStateMismatch: project.initiativeStatistics.percentAndStateMismatch,
+
+    				featuremissingStrategy: project.featureStatistics.missingStrategy,
+    				featurenotSizedCorrectly: project.featureStatistics.notSizedCorrectly,
+    				featurenoParent: project.featureStatistics.noParent,
+    				featuremissingPlannedEndDate: project.featureStatistics.missingPlannedEndDate,
+    				featuremissingActualEndDate: project.featureStatistics.missingActualEndDate,
+    				featurepercentAndStateMismatch: project.featureStatistics.percentAndStateMismatch,
+    				featureoldReleaseNotDone: project.featureStatistics.oldReleaseNotDone,
+    				featurestateDoneButNoRelease: project.featureStatistics.stateDoneButNoRelease,
+                    featuremissingLevelIdentifier: project.featureStatistics.missingLevelIdentifier,
+
+    				storynotSizedCorrectly: project.storyStatistics.notSizedCorrectly,
+    				storynoParent: project.storyStatistics.noParent,
+    				storynoTestCases: project.storyStatistics.noTestCases,
+    				storyiterationButNoRelease: project.storyStatistics.iterationButNoRelease,
+    				storyreleaseButNoIteration: project.storyStatistics.releaseButNoIteration,
+    				storyoldIterationNotAccepted: project.storyStatistics.oldIterationNotAccepted,
+
+    				defectnoParent: project.defectStatistics.noParent,
+    				defectnotSizedCorrectly: project.defectStatistics.notSizedCorrectly,
+    				defectnoEnvironment: project.defectStatistics.noEnvironment,
+    				defectnoResolution: project.defectStatistics.noResolution,
+    				defectrootCause: project.defectStatistics.rootCause,
+    				defectnoMilestone: project.defectStatistics.noMilestone,
+    				defectoldIterationNotAccepted: project.defectStatistics.oldIterationNotAccepted,
+    				defectmismatchStateAndSchedule: project.defectStatistics.mismatchStateAndSchedule,
+    				defectmissingIteration: project.defectStatistics.missingIteration,
+    				defectiterationButNoRelease: project.defectStatistics.iterationButNoRelease
+        		});
+            } else {
+                this._exportData.push({
+                    projectName: projectName,
+
+                    featuremissingStrategy: project.featureStatistics.missingStrategy,
+                    featurenotSizedCorrectly: project.featureStatistics.notSizedCorrectly,
+                    featurenoParent: project.featureStatistics.noParent,
+                    featuremissingPlannedEndDate: project.featureStatistics.missingPlannedEndDate,
+                    featuremissingActualEndDate: project.featureStatistics.missingActualEndDate,
+                    featurepercentAndStateMismatch: project.featureStatistics.percentAndStateMismatch,
+                    featureoldReleaseNotDone: project.featureStatistics.oldReleaseNotDone,
+                    featurestateDoneButNoRelease: project.featureStatistics.stateDoneButNoRelease,
+                    featuremissingLevelIdentifier: project.featureStatistics.missingLevelIdentifier,
+
+                    storynotSizedCorrectly: project.storyStatistics.notSizedCorrectly,
+                    storynoParent: project.storyStatistics.noParent,
+                    storynoTestCases: project.storyStatistics.noTestCases,
+                    storyiterationButNoRelease: project.storyStatistics.iterationButNoRelease,
+                    storyreleaseButNoIteration: project.storyStatistics.releaseButNoIteration,
+                    storyoldIterationNotAccepted: project.storyStatistics.oldIterationNotAccepted,
+
+                    defectnoParent: project.defectStatistics.noParent,
+                    defectnotSizedCorrectly: project.defectStatistics.notSizedCorrectly,
+                    defectnoEnvironment: project.defectStatistics.noEnvironment,
+                    defectnoResolution: project.defectStatistics.noResolution,
+                    defectrootCause: project.defectStatistics.rootCause,
+                    defectnoMilestone: project.defectStatistics.noMilestone,
+                    defectoldIterationNotAccepted: project.defectStatistics.oldIterationNotAccepted,
+                    defectmismatchStateAndSchedule: project.defectStatistics.mismatchStateAndSchedule,
+                    defectmissingIteration: project.defectStatistics.missingIteration,
+                    defectiterationButNoRelease: project.defectStatistics.iterationButNoRelease
+                });
+            }
 
 
     		dataFeatures.push({
@@ -528,7 +570,7 @@ Ext.define('CustomApp', {
 
 
         var featuresGrid = Ext.create('Ext.grid.Panel', {
-    		width: 600,
+    		width: 500,
     		itemId : 'featuresGrid',
     		cls: 'grid-header-project',
     		store: featureStore,
@@ -575,7 +617,7 @@ Ext.define('CustomApp', {
                 {
                     text: 'Missing Strategy', 
                     dataIndex: 'missingStrategy',
-                    flex: 2,
+                    flex: 1,
                     tdCls: 'custom-features-missingStrategy'
                     // renderer: function(value, metaData, record, rowIndex, colIndex, store, view) {
                     // 	console.log(value, metaData, record);
@@ -587,49 +629,49 @@ Ext.define('CustomApp', {
                 {
                     text: 'Not Sized Correctly',
                     dataIndex: 'notSizedCorrectly',
-                    flex: 2,
+                    flex: 1,
                     tdCls: 'custom-features-notSizedCorrectly'
                 },
                 {
                     text: 'No Parent',
                     dataIndex: 'noParent',
-                    flex: 2,
+                    flex: 1,
                     tdCls: 'custom-features-noParent'
                 },
                 {
                     text: 'Missing Planned End Date',
                     dataIndex: 'missingPlannedEndDate',
-                    flex: 2,
+                    flex: 1,
                     tdCls: 'custom-features-missingPlannedEndDate'
                 },
                 {
                     text: 'Missing Actual End Date',
                     dataIndex: 'missingActualEndDate',
-                    flex: 2,
+                    flex: 1,
                     tdCls: 'custom-features-missingActualEndDate'
                 },
                 {
                     text: '% & State Mismatched',
                     dataIndex: 'percentAndStateMismatch',
-                    flex: 2,
+                    flex: 1,
                     tdCls: 'custom-features-percentAndStateMismatch'
                 },
                 {
                     text: 'Old release not done',
                     dataIndex: 'oldReleaseNotDone',
-                    flex: 2,
+                    flex: 1,
                     tdCls: 'custom-features-oldReleaseNotDone'
                 },
                 {
                     text: 'Comp. miss Release',
                     dataIndex: 'stateDoneButNoRelease',
-                    flex: 2,
+                    flex: 1,
                     tdCls: 'custom-features-stateDoneButNoRelease'
                 },
                 {
                     text: 'Missing Level Identifier',
                     dataIndex: 'missingLevelIdentifier',
-                    flex: 2,
+                    flex: 1,
                     tdCls: 'custom-features-missingLevelIdentifier'
                 }
             ]
@@ -639,7 +681,7 @@ Ext.define('CustomApp', {
         var initiativesGrid;
         if (this._includeInitiative) {
             initiativesGrid = Ext.create('Ext.grid.Panel', {
-                width: 600,
+                width: 450,
                 itemId : 'initiativesGrid',
                 cls: 'grid-header-project',
                 store: initiativeStore,
@@ -665,10 +707,10 @@ Ext.define('CustomApp', {
                                 var type = cls.split(/[-]/)[1];
                                 var errorType = cls.split(/[-]/)[2];
 
-                                // console.log(type, errorType);
-                                // console.log(this._mapErrors[projectName]);
-                                // console.log(this._mapErrors[projectName][type]);
-                                // console.log(this._mapErrors[projectName][type][errorType]);
+                                console.log(type, errorType);
+                                console.log(this._mapErrors[projectName]);
+                                console.log(this._mapErrors[projectName][type]);
+                                console.log(this._mapErrors[projectName][type][errorType]);
 
                                 this._showDetailsGrid(this._mapErrors[projectName][type][errorType]);
                             }
@@ -686,31 +728,31 @@ Ext.define('CustomApp', {
                     {
                         text: 'Missing Strategy', 
                         dataIndex: 'missingStrategy',
-                        flex: 2,
+                        flex: 1,
                         tdCls: 'custom-initiatives-missingStrategy'
                     },
                     {
                         text: 'Not Sized Correctly',
                         dataIndex: 'notSizedCorrectly',
-                        flex: 2,
+                        flex: 1,
                         tdCls: 'custom-initiatives-notSizedCorrectly'
                     },
                     {
                         text: 'Missing Planned End Date',
                         dataIndex: 'missingPlannedEndDate',
-                        flex: 2,
+                        flex: 1,
                         tdCls: 'custom-initiatives-missingPlannedEndDate'
                     },
                     {
                         text: 'Missing Actual End Date',
                         dataIndex: 'missingActualEndDate',
-                        flex: 2,
+                        flex: 1,
                         tdCls: 'custom-initiatives-missingActualEndDate'
                     },
                     {
                         text: '% & State Mismatched',
                         dataIndex: 'percentAndStateMismatch',
-                        flex: 2,
+                        flex: 1,
                         tdCls: 'custom-initiatives-percentAndStateMismatch'
                     }
                 ]
@@ -893,7 +935,7 @@ Ext.define('CustomApp', {
 
 
 		var featurePanel = Ext.create('Ext.panel.Panel', {
-			width: 680,
+			width: 500,
 			title: 'Features Statistics',			
 			autoScroll: true,
 			padding: 5,
@@ -909,7 +951,7 @@ Ext.define('CustomApp', {
         var initiativePanel;
         if (this._includeInitiative) {
             initiativePanel = Ext.create('Ext.panel.Panel', {
-                width: 480,
+                width: 450,
                 title: 'Initiatives Statistics',           
                 autoScroll: true,
                 padding: 5,
@@ -962,8 +1004,8 @@ Ext.define('CustomApp', {
 			},
             padding: 5,            
             items: [
-                featurePanel,
                 initiativePanel,
+                featurePanel,
                 storyPanel,
                 defectPanel
             ]
@@ -1000,7 +1042,11 @@ Ext.define('CustomApp', {
 	            } else if (record.get('_type') === 'defect') {
 	            	idUrl = '/defect/';
 	            	parent = record.get('Requirement') ? record.get('Requirement').FormattedID + ' - ' + record.get('Requirement').Name : '';
-	            }
+	            } else if (record.get('_type') === 'portfolioitem/initiative') {
+                    idUrl = '/portfolioitem/initiative/';
+                    parent = record.get('Parent') ? record.get('Parent').FormattedID + ' - ' + record.get('Parent').Name : '';
+                    state = state ? state.Name : '';
+                } 
 
 	            localArtifacts.push({
 	                _ref: idUrl + id,
@@ -1353,23 +1399,23 @@ Ext.define('CustomApp', {
 
                 if (!artifact.get('c_StrategyCategory')) {
                     statistics.missingStrategy += 1;
-                    this._mapErrors[projectName].features.missingStrategy.push(artifact);
+                    this._mapErrors[projectName].initiatives.missingStrategy.push(artifact);
                 }
 
                 if (!preliminaryEstimate || (preliValues.indexOf(preliminaryEstimate) === -1)) {
                     statistics.notSizedCorrectly += 1;
-                    this._mapErrors[projectName].features.notSizedCorrectly.push(artifact);
+                    this._mapErrors[projectName].initiatives.notSizedCorrectly.push(artifact);
                 }
 
                 if (!artifact.get('PlannedEndDate')) {
                     statistics.missingPlannedEndDate +=1;
-                    this._mapErrors[projectName].features.missingPlannedEndDate.push(artifact);
+                    this._mapErrors[projectName].initiatives.missingPlannedEndDate.push(artifact);
                 }
 
                 if (!artifact.get('ActualEndDate') && ((state === 'Staging') || (state === 'Done'))) {
                     console.log(artifact, artifact.get('ActualEndDate'));
                     statistics.missingActualEndDate +=1;
-                    this._mapErrors[projectName].features.missingActualEndDate.push(artifact);
+                    this._mapErrors[projectName].initiatives.missingActualEndDate.push(artifact);
                 }
 
                 if (    ( ((percentDoneByStoryCount > 0) && (percentDoneByStoryCount < 1)) && (state !== "In-Progress") ) ||
@@ -1377,7 +1423,7 @@ Ext.define('CustomApp', {
                         ( (percentDoneByStoryCount === 0) && ((state !== "Elaborating") && (state !== "Exploring") && (state !== null)) )
                     ) {
                     statistics.percentAndStateMismatch += 1;
-                    this._mapErrors[projectName].features.percentAndStateMismatch.push(artifact);
+                    this._mapErrors[projectName].initiatives.percentAndStateMismatch.push(artifact);
                 }
             }            
         }, this);
@@ -1426,7 +1472,7 @@ Ext.define('CustomApp', {
             	}
 
             	if ( (testCaseStatus === "NONE") && 
-            			(creationDate > new Date("2018-01-01T00:00:00.000Z")) && 
+            			(creationDate > new Date("2019-01-01T00:00:00.000Z")) && 
             			((scheduleState  === "Accepted") || (scheduleState === "Ready to Ship") || (scheduleState === "Completed") || (scheduleState === "In-Progress")) ) {
             		statistics.noTestCases += 1;
             		this._mapErrors[projectName].stories.noTestCases.push(artifact);
@@ -1520,10 +1566,20 @@ Ext.define('CustomApp', {
 
             	if ( (scheduleState === "Accepted" || scheduleState === "Ready to Ship") && artifact.get('c_RootCause').Count === 0 ) {
 
-                    if (this._searchParameter === 'a' && (creationDate > new Date("2018-10-01T00:00:00.000Z"))) {
-                        statistics.rootCause += 1;
-                        this._mapErrors[projectName].defects.rootCause.push(artifact);
-                    } else if (creationDate > new Date("2017-08-13T00:00:00.000Z")) {
+                    console.log("no root cause", artifact);
+                    if (this._searchParameter === 'a') {
+                        console.log("no root parameter a, filter:", this._initDate);
+
+                        var filterDate = this._initDate; 
+                        
+                        if (creationDate > new Date(filterDate)) {
+                            console.log("no root cause using filter");
+                            statistics.rootCause += 1;
+                            this._mapErrors[projectName].defects.rootCause.push(artifact);
+                        }                        
+                    } else {
+                        console.log("no root parameter no filter:");
+
                         statistics.rootCause += 1;
                         this._mapErrors[projectName].defects.rootCause.push(artifact);
                     }
