@@ -358,9 +358,11 @@ Ext.define('CustomApp', {
             		'State', 
             		'Project', 
             		'c_StrategyCategory', 
+                    'AcceptedDate',
                     'c_ServiceLevelIdentifier',
             		'PreliminaryEstimate', 
             		'PreliminaryEstimateValue', 
+                    'TestCases',
             		'Parent', 
             		'PlannedEndDate', 
             		'ActualEndDate',
@@ -399,10 +401,63 @@ Ext.define('CustomApp', {
 
         featureStore.load().then({
 			success: function(records) {
-				//console.log('records', records);
+				console.log('records', records);
 
-                deferred.resolve(records);
-    			this.myMask.hide();				
+                //load testcases from stories using promises to lock untill all TC are loaded
+
+                var artPromises = [];
+
+                _.each(records, function(artifact) {
+                    if ('hierarchicalrequirement' === artifact.get('_type')) {
+
+                        var tcInfo = artifact.get('TestCases');
+                        var tcCount = tcInfo.Count;
+
+                        if (tcCount || tcCount > 0) {
+                            var tcLock = Ext.create('Deft.Deferred');
+                            artPromises.push(tcLock);
+
+
+                            var tcPromise = this._loadTestCases(artifact);
+
+                            Deft.Promise.all(tcPromise).then({
+                                success: function(tcs) {
+                                    //console.log('tcs loaded:', tcs);
+
+                                    artifact.get('TestCases')['data'] = tcs;
+                                    tcLock.resolve();
+
+                                    //console.log('tcs attached: ', artifact);
+
+                                },
+                                failure: function(error) {
+                                    console.log('error:', error);
+                                },
+                                scope: this
+                            });
+                        }
+                    }
+                  
+                }, this);
+
+                //console.log('promises of stories loading TCs', artPromises);
+
+                Deft.Promise.all(artPromises).then({
+                    success: function() {
+                        console.log('all stories loaded with TC');
+
+                        deferred.resolve(records);
+                        this.myMask.hide();                    
+
+                    },
+                    failure: function(error) {
+                        console.log('error:', error);
+                    },
+                    scope: this
+                });
+
+
+                			
 			},
 			scope: this
 		});
@@ -707,10 +762,10 @@ Ext.define('CustomApp', {
                                 var type = cls.split(/[-]/)[1];
                                 var errorType = cls.split(/[-]/)[2];
 
-                                console.log(type, errorType);
-                                console.log(this._mapErrors[projectName]);
-                                console.log(this._mapErrors[projectName][type]);
-                                console.log(this._mapErrors[projectName][type][errorType]);
+                                // console.log(type, errorType);
+                                // console.log(this._mapErrors[projectName]);
+                                // console.log(this._mapErrors[projectName][type]);
+                                // console.log(this._mapErrors[projectName][type][errorType]);
 
                                 this._showDetailsGrid(this._mapErrors[projectName][type][errorType]);
                             }
@@ -1433,6 +1488,8 @@ Ext.define('CustomApp', {
 
 	
 	_loadStoryStatistics: function(project, artifacts) {
+
+        //TODO  Need to create a Deferred object and return
 		var projectName = project.name;
 		console.log('extracting statistics for stories of project:', projectName);
 		var statistics = {
@@ -1451,9 +1508,10 @@ Ext.define('CustomApp', {
 
             	var parent = artifact.get('Feature');
             	var planEstimate = artifact.get('PlanEstimate');
-            	var creationDate = artifact.get('CreationDate');
+                var creationDate = artifact.get('CreationDate');
+            	var acceptedDate = artifact.get('AcceptedDate');
             	var planValues = [0, 1, 2, 3, 5, 8];
-            	var testCaseStatus = artifact.get('TestCaseStatus');
+            	//var testCaseStatus = artifact.get('TestCaseStatus');
             	var scheduleState = artifact.get('ScheduleState');
 
             	var iterationEndDate = null;
@@ -1471,12 +1529,42 @@ Ext.define('CustomApp', {
             		this._mapErrors[projectName].stories.notSizedCorrectly.push(artifact);
             	}
 
-            	if ( (testCaseStatus === "NONE") && 
-            			(creationDate > new Date("2019-01-01T00:00:00.000Z")) && 
-            			((scheduleState  === "Accepted") || (scheduleState === "Ready to Ship") || (scheduleState === "Completed") || (scheduleState === "In-Progress")) ) {
-            		statistics.noTestCases += 1;
-            		this._mapErrors[projectName].stories.noTestCases.push(artifact);
-            	}
+
+                if (acceptedDate >= new Date("2019-01-01T00:00:00.000Z")) {
+                    var tcInfo = artifact.get('TestCases');
+                    var tcCount = tcInfo.Count;
+
+                    if (!tcCount || tcCount === 0) {
+                        statistics.noTestCases += 1;
+                        this._mapErrors[projectName].stories.noTestCases.push(artifact);
+
+                    } else {
+                        if (tcCount && tcCount > 0) {
+                            var testCases = artifact.get('TestCases').data;
+                            // console.log('promises:', testCases);
+
+
+                            var correctType = false;
+
+                            var i = 0;
+                            while (i < testCases.length && !correctType) {
+                                var type = testCases[i].get('Type');
+
+                                if ('Acceptance Criteria' === type) {
+                                    correctType = true;
+                                }
+
+                                i++;
+                            }
+                            
+                            if (!correctType) {
+                                statistics.noTestCases += 1;
+                                this._mapErrors[projectName].stories.noTestCases.push(artifact);
+                            }
+                        }
+                    }
+                }
+
 
             	if (!artifact.get('Release') && artifact.get('Iteration') && creationDate > new Date('2017-08-13T00:00:00.000Z')) {
             		statistics.iterationButNoRelease += 1;
@@ -1566,19 +1654,19 @@ Ext.define('CustomApp', {
 
             	if ( (scheduleState === "Accepted" || scheduleState === "Ready to Ship") && artifact.get('c_RootCause').Count === 0 ) {
 
-                    console.log("no root cause", artifact);
+                    //console.log("no root cause", artifact);
                     if (this._searchParameter === 'a') {
-                        console.log("no root parameter a, filter:", this._initDate);
+                        //console.log("no root parameter a, filter:", this._initDate);
 
                         var filterDate = this._initDate; 
                         
                         if (creationDate > new Date(filterDate)) {
-                            console.log("no root cause using filter");
+                            //console.log("no root cause using filter");
                             statistics.rootCause += 1;
                             this._mapErrors[projectName].defects.rootCause.push(artifact);
                         }                        
                     } else {
-                        console.log("no root parameter no filter:");
+                        //console.log("no root parameter no filter:");
 
                         statistics.rootCause += 1;
                         this._mapErrors[projectName].defects.rootCause.push(artifact);
@@ -1621,6 +1709,23 @@ Ext.define('CustomApp', {
         }, this);
 
     	return statistics;
+    },
+
+
+    _loadTestCases: function(story) {
+        var deferred = Ext.create('Deft.Deferred');
+        //console.log('loading tc for story:', story);
+
+        story.getCollection('TestCases').load({
+            fetch: ['Type'],
+            callback: function(records, operation, success) {
+                //console.log('TestCase:', records);
+                deferred.resolve(records);                
+            }
+        });                    
+
+        return deferred.promise;
+
     },
 
 
