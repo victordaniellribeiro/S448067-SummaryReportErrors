@@ -413,7 +413,9 @@ Ext.define('CustomApp', {
                         var tcInfo = artifact.get('TestCases');
                         var tcCount = tcInfo.Count;
 
-                        if (tcCount || tcCount > 0) {
+                        //console.log('before loading tc:', tcInfo);
+
+                        if (tcInfo && tcCount > 0) {
                             var tcLock = Ext.create('Deft.Deferred');
                             artPromises.push(tcLock);
 
@@ -422,13 +424,12 @@ Ext.define('CustomApp', {
 
                             Deft.Promise.all(tcPromise).then({
                                 success: function(tcs) {
-                                    //console.log('tcs loaded:', tcs);
+                                    //console.log('tcs loaded for:',tcInfo);
 
                                     artifact.get('TestCases')['data'] = tcs;
+                                    //console.log('tcs attached: ', tcs);
+
                                     tcLock.resolve();
-
-                                    //console.log('tcs attached: ', artifact);
-
                                 },
                                 failure: function(error) {
                                     console.log('error:', error);
@@ -1534,14 +1535,16 @@ Ext.define('CustomApp', {
                     var tcInfo = artifact.get('TestCases');
                     var tcCount = tcInfo.Count;
 
-                    if (!tcCount || tcCount === 0) {
+                    //console.log('tcInfo:', tcInfo);
+
+                    if (!tcInfo || tcCount === 0) {
                         statistics.noTestCases += 1;
                         this._mapErrors[projectName].stories.noTestCases.push(artifact);
 
                     } else {
-                        if (tcCount && tcCount > 0) {
+                        if (tcInfo && tcCount > 0 && artifact.get('TestCases').data) {
                             var testCases = artifact.get('TestCases').data;
-                            // console.log('promises:', testCases);
+                            //console.log('testCases from artifact:', testCases, artifact);
 
 
                             var correctType = false;
@@ -1719,7 +1722,7 @@ Ext.define('CustomApp', {
         story.getCollection('TestCases').load({
             fetch: ['Type'],
             callback: function(records, operation, success) {
-                //console.log('TestCase:', records);
+                //console.log('TestCase loaded:', records);
                 deferred.resolve(records);                
             }
         });                    
