@@ -7,7 +7,82 @@
 
     <script type="text/javascript">
         Rally.onReady(function () {
-                Ext.define('CustomApp', {
+                Ext.define('Ext.form.field.Month', {
+        extend: 'Ext.form.field.Date',
+        alias: 'widget.monthfield',
+        requires: ['Ext.picker.Month'],
+        alternateClassName: ['Ext.form.MonthField', 'Ext.form.Month'],
+        selectMonth: null,
+        createPicker: function() {
+            var me = this,
+                format = Ext.String.format;
+            return Ext.create('Ext.picker.Month', {
+                pickerField: me,
+                ownerCt: me.ownerCt,
+                renderTo: document.body,
+                floating: true,
+                hidden: true,
+                focusOnShow: true,
+                minDate: me.minValue,
+                maxDate: me.maxValue,
+                disabledDatesRE: me.disabledDatesRE,
+                disabledDatesText: me.disabledDatesText,
+                disabledDays: me.disabledDays,
+                disabledDaysText: me.disabledDaysText,
+                format: me.format,
+                showToday: me.showToday,
+                startDay: me.startDay,
+                minText: format(me.minText, me.formatDate(me.minValue)),
+                maxText: format(me.maxText, me.formatDate(me.maxValue)),
+                listeners: {
+                    select: {
+                        scope: me,
+                        fn: me.onSelect
+                    },
+                    monthdblclick: {
+                        scope: me,
+                        fn: me.onOKClick
+                    },
+                    yeardblclick: {
+                        scope: me,
+                        fn: me.onOKClick
+                    },
+                    OkClick: {
+                        scope: me,
+                        fn: me.onOKClick
+                    },
+                    CancelClick: {
+                        scope: me,
+                        fn: me.onCancelClick
+                    }
+                },
+                keyNavConfig: {
+                    esc: function() {
+                        me.collapse();
+                    }
+                }
+            });
+        },
+        onCancelClick: function() {
+            var me = this;
+            me.selectMonth = null;
+            me.collapse();
+        },
+        onOKClick: function() {
+            var me = this;
+            if (me.selectMonth) {
+                me.setValue(me.selectMonth);
+                me.fireEvent('select', me, me.selectMonth);
+            }
+            me.collapse();
+        },
+        onSelect: function(m, d) {
+            var me = this;
+            me.selectMonth = new Date((d[0] + 1) + '/1/' + d[1]);
+        }
+});
+
+Ext.define('CustomApp', {
     extend: 'Rally.app.App',
     componentCls: 'app',
 
@@ -15,9 +90,13 @@
     _projectId: undefined,
     _releaseId: undefined,
     _releaseName: undefined,
+    _releaseStartDate: undefined,
+    _releaseEndDate: undefined,
     _initDate: undefined,
     _iterationId: undefined,
     _iterationName: undefined,
+    _iterationStartDate: undefined,
+    _iterationEndDate: undefined,
     _mapErrors: undefined, //project -> feature/defect/story -> errortype -> [artifacts];
     _exportData:undefined,
     _exportDataDetails:undefined,
@@ -76,8 +155,8 @@
 				ready: function(combobox) {
 					var release = combobox.getRecord();
 
-					//this._initDate = Rally.util.DateTime.toIsoString(release.get('ReleaseStartDate'),true);
-					//this._endDate = Rally.util.DateTime.toIsoString(release.get('ReleaseDate'),true);
+					this._releaseStartDate = Rally.util.DateTime.toIsoString(release.get('ReleaseStartDate'),true);
+					this._releaseEndDate = Rally.util.DateTime.toIsoString(release.get('ReleaseDate'),true);
 					this._releaseId = release.get('ObjectID');
 					this._releaseName = combobox.getRecord().get('Name'); 
 					console.log(release);
@@ -85,8 +164,8 @@
 				select: function(combobox, records) {
 					var release = records[0];
 
-					//this._initDate = Rally.util.DateTime.toIsoString(release.get('ReleaseStartDate'),true);
-					//this._endDate = Rally.util.DateTime.toIsoString(release.get('ReleaseDate'),true);
+					this._releaseStartDate = Rally.util.DateTime.toIsoString(release.get('ReleaseStartDate'),true);
+                    this._releaseEndDate = Rally.util.DateTime.toIsoString(release.get('ReleaseDate'),true);
 					this._releaseId = release.get('ObjectID');
 					this._releaseName = combobox.getRecord().get('Name');  
 					this._releaseDate = release.get('ReleaseDate');
@@ -106,12 +185,18 @@
             listeners: {
                 ready: function(combobox) {
                 	var iteration = combobox.getRecord();
+
+                    this._iterationStartDate = Rally.util.DateTime.toIsoString(iteration.get('StartDate'),true);
+                    this._iterationEndDate = Rally.util.DateTime.toIsoString(iteration.get('EndDate'),true);
                 	this._iterationId = iteration.get('ObjectID');
                 	this._iterationName = iteration.get('Name');
 
                 },
                 select: function(combobox, records, opts) {
                     var iteration = records[0];
+
+                    this._iterationStartDate = Rally.util.DateTime.toIsoString(iteration.get('StartDate'),true);
+                    this._iterationEndDate = Rally.util.DateTime.toIsoString(iteration.get('EndDate'),true);
                 	this._iterationId = iteration.get('ObjectID');
                 	this._iterationName = iteration.get('Name');
                 },
@@ -121,11 +206,15 @@
         });
 
 
-        var initDatePicker = Ext.create('Ext.form.field.Date', {
-            fieldLabel: 'Starting From:',
+        var initDatePicker = Ext.create('Ext.form.field.Month', {
+            fieldLabel: 'Choose month:',
+            format: 'F, Y',
             listeners : {
                 select: function(picker, date) {
-                    // console.log(this._initDate);
+                    //console.log('date', date);
+                    //console.log(picker.selectMonth);
+                    // first date of month
+                    console.log(this._initDate);
                     this._initDate = date.toISOString();
                 },
                 scope: this
@@ -270,8 +359,20 @@
                             initDatePicker.show();
 			            }
 			        },
+                    afterrender: function(){
+                       Ext.QuickTips.init();
+                       Ext.QuickTips.register({
+                         target: 'radio3',
+                         text: 'Search for All option limited by 30 days',
+                         width: 250,
+                         dismissDelay: 2000
+                       }) ;
+                    },
+                    destroy:function(){
+                       Ext.QuickTips.destroy();
+                    },
 			        scope: this
-			    }
+			    },
 	        }]
 		},
 		{
@@ -318,20 +419,375 @@
     },
 
 
+    _loadStories: function() {
+        console.log('loading stories:');
+        var deferred = Ext.create('Deft.Deferred');
+
+        var storiesStore = Ext.create('Rally.data.WsapiDataStore', {
+            model: 'HierarchicalRequirement',
+            context: {
+                project: '/project/' + this._projectId, //null to search all workspace
+                projectScopeUp: false,
+                projectScopeDown: true,
+            },
+            fetch: ['Name', 
+                    'FormattedID', 
+                    'ScheduleState', 
+                    'State', 
+                    'Project', 
+                    'AcceptedDate',
+                    'c_ServiceLevelIdentifier',
+                    'TestCases',
+                    'Parent', 
+                    'PlannedEndDate', 
+                    'ActualEndDate',
+                    'Release',
+                    'ReleaseDate',
+                    'CreationDate',
+                    'Feature',
+                    'PlanEstimate',
+                    'TestCaseStatus',
+                    'Iteration',
+                    'EndDate',
+                    'Requirement'],
+            limit: Infinity,
+            sorters: [{
+                property: 'CreationDate',
+                direction: 'ASC'
+            }]
+        });
+
+        var filter = this._getFilter();
+        if (filter) {
+            storiesStore.addFilter(filter);
+        }
+
+        storiesStore.load().then({
+            success: function(records) {
+                this.stories = records;
+                // console.log('Stories:', records);
+                deferred.resolve(records);
+
+            },
+            scope: this
+        });
+
+        return deferred.promise;
+    },
+
+
+    _loadDefects: function() {
+        console.log('loading defects:');
+        var deferred = Ext.create('Deft.Deferred');
+
+        var defectsStore = Ext.create('Rally.data.WsapiDataStore', {
+            model: 'Defect',
+            context: {
+                project: '/project/' + this._projectId, //null to search all workspace
+                projectScopeUp: false,
+                projectScopeDown: true,
+            },
+            fetch: ['Name', 
+                    'FormattedID', 
+                    'ScheduleState', 
+                    'State', 
+                    'Project', 
+                    'c_StrategyCategory', 
+                    'AcceptedDate',
+                    'c_ServiceLevelIdentifier',
+                    'PreliminaryEstimate', 
+                    'PreliminaryEstimateValue', 
+                    'TestCases',
+                    'Parent', 
+                    'PlannedEndDate', 
+                    'ActualEndDate',
+                    'PercentDoneByStoryCount',
+                    'Release',
+                    'ReleaseDate',
+                    'CreationDate',
+                    'Feature',
+                    'PlanEstimate',
+                    'TestCaseStatus',
+                    'Iteration',
+                    'EndDate',
+                    'Requirement',
+                    'Environment',
+                    'c_RootCause',
+                    'Milestones',
+                    'Resolution',
+                    ],
+            limit: Infinity,
+            sorters: [{
+                property: 'CreationDate',
+                direction: 'ASC'
+            }]
+        });
+
+        var filter = this._getFilter();
+        if (filter) {
+            defectsStore.addFilter(filter);
+        }
+
+        defectsStore.load().then({
+            success: function(records) {
+                this.defects = records;
+                // console.log('defects:', records);
+                deferred.resolve(records);
+
+            },
+            scope: this
+        });
+
+        return deferred.promise;
+    },
+
+
+    _loadFeatures: function() {
+        console.log('loading features:');
+        var deferred = Ext.create('Deft.Deferred');
+
+        var featuresStore = Ext.create('Rally.data.WsapiDataStore', {
+            model: 'PortfolioItem/Feature',
+            context: {
+                project: '/project/' + this._projectId, //null to search all workspace
+                projectScopeUp: false,
+                projectScopeDown: true,
+            },
+            fetch: ['Name', 
+                    'FormattedID', 
+                    'ScheduleState', 
+                    'State', 
+                    'Project', 
+                    'c_StrategyCategory', 
+                    'AcceptedDate',
+                    'c_ServiceLevelIdentifier',
+                    'PreliminaryEstimate', 
+                    'PreliminaryEstimateValue', 
+                    'TestCases',
+                    'Parent', 
+                    'PlannedEndDate', 
+                    'ActualEndDate',
+                    'PercentDoneByStoryCount',
+                    'Release',
+                    'ReleaseDate',
+                    'CreationDate',
+                    'Feature',
+                    'PlanEstimate',
+                    'TestCaseStatus',
+                    'Iteration',
+                    'EndDate',
+                    'Milestones'],
+            limit: Infinity,
+            sorters: [{
+                property: 'CreationDate',
+                direction: 'ASC'
+            }]
+        });
+
+        var filter = this._getFilter();
+        if (filter) {
+            featuresStore.addFilter(filter);
+        }
+
+        featuresStore.load().then({
+            success: function(records) {
+                this.features = records;
+                // console.log('features:', records);
+                deferred.resolve(records);
+
+            },
+            scope: this
+        });
+
+        return deferred.promise;
+    },
+
+
+    _loadInitiatives: function() {
+        console.log('loading initiatives:');
+        var deferred = Ext.create('Deft.Deferred');
+
+        var initiativesStore = Ext.create('Rally.data.WsapiDataStore', {
+            model: 'PortfolioItem/Initiative',
+            context: {
+                project: '/project/' + this._projectId, //null to search all workspace
+                projectScopeUp: false,
+                projectScopeDown: true,
+            },
+            fetch: ['Name', 
+                    'FormattedID', 
+                    'ScheduleState', 
+                    'State', 
+                    'Project', 
+                    'c_StrategyCategory', 
+                    'AcceptedDate',
+                    'c_ServiceLevelIdentifier',
+                    'PreliminaryEstimate', 
+                    'PreliminaryEstimateValue', 
+                    'TestCases',
+                    'Parent', 
+                    'PlannedEndDate', 
+                    'ActualEndDate',
+                    'PercentDoneByStoryCount',
+                    'Release',
+                    'ReleaseDate',
+                    'CreationDate',
+                    'Feature',
+                    'PlanEstimate',
+                    'TestCaseStatus',
+                    'Iteration',
+                    'EndDate',
+                    'Milestones'],
+            limit: Infinity,
+            sorters: [{
+                property: 'CreationDate',
+                direction: 'ASC'
+            }]
+        });
+
+        var filter = this._getFilterInitiative();
+        if (filter) {
+            initiativesStore.addFilter(filter);
+        }
+
+        initiativesStore.load().then({
+            success: function(records) {
+                this.initiatives = records;
+                // console.log('Initiatives:', records);
+                deferred.resolve(records);
+
+            },
+            error: function(error) {
+                console.log('error', error);
+            },
+            scope: this
+        });
+
+        return deferred.promise;
+    },
+
+
     _loadStoriesAndFeatures: function() {
     	console.log('loading features and stories');
         var deferred = Ext.create('Deft.Deferred');
 
+        this._loadStories().then({
+            success: function() {
+                return this._loadDefects();
+            }, scope: this
+        }).then({
+            success: function() {
+                return this._loadFeatures();
+            }, scope: this
+        }).then({
+            success: function() {
+                var iLock;
+                var allRecords = [];
+
+                allRecords = allRecords.concat(this.stories);
+                allRecords = allRecords.concat(this.defects);
+                allRecords = allRecords.concat(this.features);
+
+
+                // console.log('all Records:', allRecords);
+
+                if (this._includeInitiative) {
+                    iLock = this._loadInitiatives();
+                } else {
+                    iLock = Ext.create('Deft.Deferred');
+                    iLock.resolve();
+                }
+
+                Deft.Promise.all([iLock]).then({
+                    success: function(records) {
+                        // console.log('all Records:', allRecords);
+
+                        if (this._includeInitiative) {
+                            allRecords = allRecords.concat(this.initiatives);                            
+                        }
+
+                        // console.log('all records', allRecords);.
+
+                        if (allRecords && allRecords.length > 0) {
+                            var artPromises = [];
+
+                            _.each(allRecords, function(artifact) {
+                                if ('hierarchicalrequirement' === artifact.get('_type')) {
+
+                                    var tcInfo = artifact.get('TestCases');
+                                    var tcCount = tcInfo.Count;
+
+                                    //console.log('before loading tc:', tcInfo);
+
+                                    if (tcInfo && tcCount > 0) {
+                                        var tcLock = Ext.create('Deft.Deferred');
+                                        artPromises.push(tcLock);
+
+
+                                        var tcPromise = this._loadTestCases(artifact);
+
+                                        Deft.Promise.all(tcPromise).then({
+                                            success: function(tcs) {
+                                                //console.log('tcs loaded for:',tcInfo);
+
+                                                artifact.get('TestCases')['data'] = tcs;
+                                                //console.log('tcs attached: ', tcs);
+
+                                                tcLock.resolve();
+                                            },
+                                            failure: function(error) {
+                                                console.log('error:', error);
+                                            },
+                                            scope: this
+                                        });
+                                    }
+                                }
+                              
+                            }, this);
+
+                            //console.log('promises of stories loading TCs', artPromises);
+
+
+                            Deft.Promise.all(artPromises).then({
+                                success: function() {
+                                    console.log('all stories loaded with TC');
+
+                                    deferred.resolve(allRecords);
+                                    this.myMask.hide();                    
+
+                                },
+                                failure: function(error) {
+                                    console.log('error:', error);
+                                },
+                                scope: this
+                            });
+                        } else {
+                            this.myMask.hide();
+                        }
+                    },
+                    failure: function(error) {
+                        console.log('error:', error);
+                    },
+                    scope: this
+                });
+            }, scope: this
+        });
+
+        return deferred.promise;
+    },
+
+
+    _getFilter: function() {
         var filter;
 
         if (this._searchParameter === 'r') {
-        	filter = {
+            filter = {
                 property: 'Release.Name',
                 operator: '=',
                 value: this._releaseName
             };
         } else if (this._searchParameter === 'i') {
-        	filter = {
+            filter = {
                 property: 'Iteration.Name',
                 operator: '=',
                 value: this._iterationName
@@ -345,134 +801,63 @@
             // };        
             if (this._initDate) {
                 console.log('looking for all artifacts from:', this._initDate);
-                filter = {
-            		property: 'CreationDate',
-            		operator: '>',
-            		value: this._initDate
-            	};
-            }
-        }
-
-        var models = ['HierarchicalRequirement', 'PortfolioItem/Feature', 'Defect'];
-
-        if (this._includeInitiative) {
-            models.push('PortfolioItem/Initiative');
-        }
-
-        var featureStore = Ext.create('Rally.data.wsapi.artifact.Store', {
-            models: models,
-            fetch: ['Name', 
-            		'FormattedID', 
-            		'ScheduleState', 
-            		'State', 
-            		'Project', 
-            		'c_StrategyCategory', 
-                    'AcceptedDate',
-                    'c_ServiceLevelIdentifier',
-            		'PreliminaryEstimate', 
-            		'PreliminaryEstimateValue', 
-                    'TestCases',
-            		'Parent', 
-            		'PlannedEndDate', 
-            		'ActualEndDate',
-            		'PercentDoneByStoryCount',
-            		'Release',
-            		'ReleaseDate',
-            		'CreationDate',
-            		'Feature',
-            		'PlanEstimate',
-            		'TestCaseStatus',
-            		'Iteration',
-            		'EndDate',
-            		'Requirement',
-            		'Environment',
-            		'c_RootCause',
-            		'Milestones',
-            		'Resolution',
-            		],
-            limit: Infinity,
-            context: {
-                project: '/project/' + this._projectId, //null to search all workspace
-                projectScopeUp: false,
-                projectScopeDown: true,
-            },
-            //filters: [filter],
-            sorters: [{
-                property: 'CreationDate',
-                direction: 'ASC'
-            }]
-        });
-
-        if (filter) {
-            featureStore.addFilter(filter);
-        }
-
-
-        featureStore.load().then({
-			success: function(records) {
-				console.log('records', records);
-
-                //load testcases from stories using promises to lock untill all TC are loaded
-
-                var artPromises = [];
-
-                _.each(records, function(artifact) {
-                    if ('hierarchicalrequirement' === artifact.get('_type')) {
-
-                        var tcInfo = artifact.get('TestCases');
-                        var tcCount = tcInfo.Count;
-
-                        //console.log('before loading tc:', tcInfo);
-
-                        if (tcInfo && tcCount > 0) {
-                            var tcLock = Ext.create('Deft.Deferred');
-                            artPromises.push(tcLock);
-
-
-                            var tcPromise = this._loadTestCases(artifact);
-
-                            Deft.Promise.all(tcPromise).then({
-                                success: function(tcs) {
-                                    //console.log('tcs loaded for:',tcInfo);
-
-                                    artifact.get('TestCases')['data'] = tcs;
-                                    //console.log('tcs attached: ', tcs);
-
-                                    tcLock.resolve();
-                                },
-                                failure: function(error) {
-                                    console.log('error:', error);
-                                },
-                                scope: this
-                            });
-                        }
-                    }
-                  
-                }, this);
-
-                //console.log('promises of stories loading TCs', artPromises);
-
-                Deft.Promise.all(artPromises).then({
-                    success: function() {
-                        console.log('all stories loaded with TC');
-
-                        deferred.resolve(records);
-                        this.myMask.hide();                    
-
-                    },
-                    failure: function(error) {
-                        console.log('error:', error);
-                    },
-                    scope: this
+                var initFilter = Ext.create('Rally.data.QueryFilter', {
+                    property: 'CreationDate',
+                    operator: '>',
+                    value: this._initDate
                 });
 
+                var endDate = new Date(new Date(this._initDate).getFullYear(), new Date(this._initDate).getMonth() + 1, 0);
 
-                			
-			},
-			scope: this
-		});
+                console.log('end date:', endDate.toISOString());
 
-        return deferred.promise;
+                var endFilter = Ext.create('Rally.data.QueryFilter', {
+                    property: 'CreationDate',
+                    operator: '<=',
+                    value: endDate.toISOString()
+                });
+
+                filter = initFilter.and(endFilter);
+            }
+        }
+        
+        return filter;
+    },
+
+
+    _getFilterInitiative: function() {
+        var filter;
+        if (this._includeInitiative && (this._searchParameter === 'r' || this._searchParameter === 'i')) {
+
+            var initDate, endDate;
+            if (this._searchParameter === 'r') {
+                initDate = this._releaseStartDate;
+                endDate = this._releaseEndDate;
+            }
+
+            if (this._searchParameter === 'i') {
+                initDate = this._iterationStartDate;
+                endDate = this._iterationEndDate;
+            }
+
+            var initFilter = Ext.create('Rally.data.QueryFilter', {
+                property: 'CreationDate',
+                operator: '>',
+                value: initDate
+            });
+
+            var endFilter = Ext.create('Rally.data.QueryFilter', {
+                property: 'CreationDate',
+                operator: '<=',
+                value: endDate
+            });
+
+            filter = initFilter.and(endFilter);
+        } else {
+            return this._getFilter();
+        }
+
+        return filter;
     },
 
 
