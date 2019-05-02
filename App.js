@@ -322,7 +322,8 @@ Ext.define('CustomApp', {
 	                    inputValue: 'i',
 	                    id        : 'radio2'
 	                }, {
-	                    boxLabel  : 'All',
+	                    boxLabel  : 'By Month',
+                        width: 80,
 	                    name      : 'parameter',
 	                    padding: '0 10 0 0',			            
 	                    inputValue: 'a',
@@ -456,7 +457,7 @@ Ext.define('CustomApp', {
         storiesStore.load().then({
             success: function(records) {
                 this.stories = records;
-                // console.log('Stories:', records);
+                //console.log('Stories:', records);
                 deferred.resolve(records);
 
             },
@@ -522,7 +523,7 @@ Ext.define('CustomApp', {
         defectsStore.load().then({
             success: function(records) {
                 this.defects = records;
-                // console.log('defects:', records);
+                //console.log('defects:', records);
                 deferred.resolve(records);
 
             },
@@ -575,15 +576,24 @@ Ext.define('CustomApp', {
             }]
         });
 
-        var filter = this._getFilter();
+        var filter;
+        if (this._searchParameter === 'i') {
+            filter = this._getIterationFilterForFeatures();
+        } else {
+            filter = this._getFilter();
+        }
+
         if (filter) {
             featuresStore.addFilter(filter);
         }
 
+        console.log('filter', filter);
+        //console.log('feature store', featuresStore);
+
         featuresStore.load().then({
             success: function(records) {
                 this.features = records;
-                // console.log('features:', records);
+                //console.log('features:', records);
                 deferred.resolve(records);
 
             },
@@ -691,7 +701,7 @@ Ext.define('CustomApp', {
 
                 Deft.Promise.all([iLock]).then({
                     success: function(records) {
-                        // console.log('all Records:', allRecords);
+                        console.log('all Records:', allRecords);
 
                         if (this._includeInitiative) {
                             allRecords = allRecords.concat(this.initiatives);                            
@@ -739,19 +749,24 @@ Ext.define('CustomApp', {
                             //console.log('promises of stories loading TCs', artPromises);
 
 
-                            Deft.Promise.all(artPromises).then({
-                                success: function() {
-                                    console.log('all stories loaded with TC');
+                            //only if there is any TC to load
+                            if (artPromises && artPromises.length > 0) {
+                                Deft.Promise.all(artPromises).then({
+                                    success: function() {
+                                        console.log('all stories loaded with TC');
 
-                                    deferred.resolve(allRecords);
-                                    this.myMask.hide();                    
-
-                                },
-                                failure: function(error) {
-                                    console.log('error:', error);
-                                },
-                                scope: this
-                            });
+                                        deferred.resolve(allRecords);
+                                        this.myMask.hide();
+                                    },
+                                    failure: function(error) {
+                                        console.log('error:', error);
+                                    },
+                                    scope: this
+                                });
+                            } else {
+                                deferred.resolve(allRecords);
+                                this.myMask.hide();
+                            }
                         } else {
                             this.myMask.hide();
                         }
@@ -812,6 +827,29 @@ Ext.define('CustomApp', {
             }
         }
         
+        return filter;
+    },
+
+
+    _getIterationFilterForFeatures: function() {
+        var filter;
+        initDate = this._iterationStartDate;
+        endDate = this._iterationEndDate;
+
+        var initFilter = Ext.create('Rally.data.QueryFilter', {
+            property: 'CreationDate',
+            operator: '>',
+            value: initDate
+        });
+
+        var endFilter = Ext.create('Rally.data.QueryFilter', {
+            property: 'CreationDate',
+            operator: '<=',
+            value: endDate
+        });
+
+        filter = initFilter.and(endFilter);
+
         return filter;
     },
 
